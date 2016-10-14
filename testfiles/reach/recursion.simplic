@@ -1,0 +1,17 @@
+int main(){
+	int i = 3;
+	rec(i);
+	print(i + 1);
+}
+
+int rec(int i){
+	print(i);
+	if(i == 0){
+		return 0;
+	}	
+	return rec(i - 1);
+}
+
+int notReachable(){
+}
+	

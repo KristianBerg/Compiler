@@ -1,0 +1,26 @@
+import java.util.HashSet;
+
+aspect FuncCall {
+	inh Func IdDecl.enclosingFunc();
+	syn Func FuncUse.enclosingFunc() = getIdUse().decl().enclosingFunc();
+
+	eq Func.getChild().enclosingFunc() = this;
+	
+	eq Program.getChild().enclosingFunc() = unknownFunc();
+	
+	coll Set<Func> Func.functionCalls() [new HashSet<Func>()] with add root Func;
+
+	FuncUse contributes getIdUse().decl().enclosingFunc() to Func.functionCalls();
+}
+
+aspect Reachability {
+	syn HashSet<Func> Func.reachable() circular [new HashSet<Func>()];
+	eq Func.reachable() {
+		HashSet<Func> reach = new HashSet<Func>();
+		for(Func f: functionCalls()){
+			reach.add(f);
+			reach.addAll(f.reachable());
+		}
+		return reach;
+	}
+}

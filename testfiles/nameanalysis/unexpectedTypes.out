@@ -1,0 +1,13 @@
+Error at line 2: expression 1 < 2
+: expected type int but was boolean
+Error at line 3: expression 2 * a
+: expected type boolean but was int
+Error at line 4: expression 2 == 4
+: expected type int but was boolean
+Error at line 5: symbol 'b' is not declared
+Error at line 7: expression 6 >= 3
+: expected type int but was boolean
+Error at line 8: expression f() + 2
+: expected type boolean but was int
+Error at line 10: expression f()
+: expected type boolean but was int

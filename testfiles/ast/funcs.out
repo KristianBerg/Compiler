@@ -1,0 +1,14 @@
+Program
+  List
+    Func
+      IdDecl ID="a"
+      List
+      Block
+        List
+    Func
+      IdDecl ID="b"
+      List
+        IdDecl ID="m"
+        IdDecl ID="n"
+      Block
+        List

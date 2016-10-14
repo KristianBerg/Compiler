@@ -1,0 +1,73 @@
+Program
+  List
+    Func
+      IdDecl ID="f"
+      List
+        IdDecl ID="a"
+        IdDecl ID="b"
+      Block
+        List
+          IdDeclStmt
+            IdDecl ID="c"
+          Assign
+            IdUse ID="c"
+            Numeral NUM="0"
+          WhileStmt
+            LessThan
+              IdUse ID="c"
+              Numeral NUM="5"
+            Block
+              List
+                Assign
+                  IdUse ID="c"
+                  Add
+                    IdUse ID="c"
+                    Numeral NUM="1"
+          IfStmt
+            GreaterThan
+              IdUse ID="a"
+              IdUse ID="b"
+            Block
+              List
+                Assign
+                  IdUse ID="a"
+                  IdUse ID="b"
+            Opt
+              ElseStmt
+                Block
+                  List
+                    Assign
+                      IdUse ID="b"
+                      IdUse ID="a"
+          FuncStmt
+            FuncUse
+              IdUse ID="print"
+              List
+                Add
+                  IdUse ID="a"
+                  IdUse ID="b"
+          ReturnStmt
+            Add
+              IdUse ID="a"
+              IdUse ID="b"
+    Func
+      IdDecl ID="main"
+      List
+      Block
+        List
+          IdDeclStmt
+            IdDecl ID="r"
+          Assign
+            IdUse ID="r"
+            FuncUse
+              IdUse ID="f"
+              List
+                Numeral NUM="2"
+                Numeral NUM="3"
+          FuncStmt
+            FuncUse
+              IdUse ID="print"
+              List
+                FuncUse
+                  IdUse ID="g"
+                  List

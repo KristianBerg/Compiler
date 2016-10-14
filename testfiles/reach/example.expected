@@ -1,0 +1,8 @@
+gcd1 reaches:
+gcd2 reaches:
+gcd2
+main reaches:
+gcd1
+print
+gcd2
+read

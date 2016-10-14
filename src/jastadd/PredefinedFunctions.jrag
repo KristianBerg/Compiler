@@ -1,0 +1,17 @@
+aspect PredefinedFunctions {
+
+	syn nta List<Func> Program.predefinedFunctions() {
+		List<Func> list = new List<Func>();
+
+		// Create objects of type FunctionDecl and add them to the list
+		Func read = new Func(new IdDecl("read"), new List(), new Block());
+		list.add(read);
+		Func print = new Func(new IdDecl("print"), new List().add(new IdDecl("int text")), new Block());
+		list.add(print);
+		return list;
+	}
+
+	
+	inh List<Func> ASTNode.predefinedFunctions();
+	eq Program.getChild().predefinedFunctions() = predefinedFunctions();
+}

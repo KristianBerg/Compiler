@@ -1,0 +1,9 @@
+int f() {
+	read();
+	print(2);
+	int read = 0;
+	int print;
+}
+
+int read(){
+}

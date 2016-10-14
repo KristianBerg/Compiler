@@ -1,0 +1,32 @@
+int main() {
+	f(2, 5);
+	int a = 5;
+	print(a);
+	int b;
+	b = 5;
+	print(b);
+	b = a;
+	print(b);
+	b = a * 3 - 10;
+	print(b);
+	print(a);
+	print(g());
+	h(1,2);
+	print(a);
+}
+
+int f(int a, int b){
+	print(a * 4 - 3);
+	print(b);
+	if(a < b){
+		print(a + b - 2);
+	}
+}
+
+int g() {
+	return 5;
+}
+
+int h(int a, int b){
+	return a * b;
+}

@@ -1,0 +1,68 @@
+aspect TypeAnalysis {
+	
+	syn nta BoolType Program.boolType() = new BoolType();
+	syn nta IntType Program.intType() = new IntType();
+	syn nta UnknownType Program.unknownType() = new UnknownType();
+	syn boolean Type.compatibleWith(Type t) = this == t | t == unknownType() | this == unknownType();	
+
+	inh BoolType ASTNode.boolType();
+	inh IntType ASTNode.intType();
+	inh UnknownType ASTNode.unknownType();
+
+	eq Program.getChild().boolType() = boolType();
+	eq Program.getChild().intType() = intType();
+	eq Program.getChild().unknownType() = unknownType();
+	
+	syn Type BinaryExpr.type(){
+		if(!getLeft().type().compatibleWith(getRight().type())){
+			return unknownType();
+		}
+		return getLeft().type();
+	} syn Type BoolBinaryExpr.type(){
+		return boolType();
+	} syn Type Expr.type(){
+		return intType();
+	}
+
+	syn String BoolType.toString(){
+		return "boolean";
+	} syn String IntType.toString(){
+		return "int";
+	} syn String UnknownType.toString(){
+		return "<unknown>";
+	}
+	
+
+	inh Type Expr.expectedType();
+
+	eq WhileStmt.getExpr().expectedType() = boolType();
+	eq IfStmt.getExpr().expectedType() = boolType();
+	eq Program.getChild().expectedType() = intType();
+	eq ArithmeticBinaryExpr.getChild().expectedType() = intType();
+	eq FuncUse.getIdUse().expectedType() = unknownType();
+	eq Expr.getChild().expectedType() = intType();
+
+	syn boolean Expr.isUnexpected() = !type().compatibleWith(expectedType());
+
+	inh Func IdDecl.function();
+	eq Func.getFuncName().function() = this;
+	eq Program.getChild().function() = null;
+
+	syn boolean FuncUse.correctNumParam(){
+		if(getIdUse().decl() == unknownDecl()){
+			return true;
+		}
+		return getIdUse().decl().function().getNumParam() == getNumExpr();
+	}
+
+}
+
+/*aspect UnknownDecl {
+	syn nta UnknownDecl Program.unknownDecl() { return new UnknownDecl();}
+	
+	inh UnknownDecl ASTNode.unknownDecl();
+	eq Program.getChild().unknownDecl() = unknownDecl();
+	
+	syn boolean IdDecl.isUnknown() = false;
+	eq UnknownDecl.isUnknown() = true;
+}*/

@@ -1,0 +1,8 @@
+gcd1 encloses:
+gcd2 encloses:
+gcd2
+main encloses:
+gcd1
+print
+gcd2
+read

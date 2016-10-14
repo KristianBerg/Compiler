@@ -1,0 +1,46 @@
+Program ::= Func*;
+
+Func ::= FuncName:IdDecl Param:IdDecl* Block;
+UnknownFunc: Func;
+
+abstract Stmt;
+IdDecl ::= <ID>;
+IdDeclStmt: Stmt ::= IdDecl;
+IdDeclAss: Stmt ::= IdDecl Expr;
+Block ::= Stmt*;
+UnknownDecl: IdDecl;
+Assign: Stmt ::= IdUse Expr;
+ReturnStmt: Stmt ::= Expr;
+WhileStmt: Stmt ::= Expr Block;
+FuncStmt: Stmt ::= FuncUse;
+IfStmt: Stmt ::= Expr Block [ElseStmt];
+ElseStmt ::= Block;
+
+abstract Type;
+IntType: Type;
+BoolType: Type;
+UnknownType: Type;
+
+abstract Expr;
+abstract BinaryExpr: Expr ::= Left:Expr Right:Expr;
+abstract BoolBinaryExpr: BinaryExpr;
+abstract ArithmeticBinaryExpr: BinaryExpr;
+
+Equals: BoolBinaryExpr;
+NotEquals: BoolBinaryExpr;
+LessThan: BoolBinaryExpr;
+LessEqual: BoolBinaryExpr;
+GreaterThan: BoolBinaryExpr;
+GreaterEqual: BoolBinaryExpr;
+
+Add: ArithmeticBinaryExpr;
+Sub: ArithmeticBinaryExpr;
+Mul: ArithmeticBinaryExpr;
+Div: ArithmeticBinaryExpr;
+Mod: ArithmeticBinaryExpr;
+
+abstract Factor: Expr;
+Numeral: Expr ::= <NUM>;
+IdUse: Expr ::= <ID>;
+FuncUse: Expr ::= IdUse Expr*;
+

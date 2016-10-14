@@ -1,0 +1,148 @@
+%class "LangParser";
+%package "lang.ast";
+
+%embed {:
+	static public class SyntaxError extends RuntimeException { public SyntaxError(String msg) {super(msg);}}
+	// Disable syntax error recovery
+	protected void recoverFromError(Symbol token, TokenStream in) {
+		throw new SyntaxError("Cannot recover from the syntax error");
+	}
+:};
+
+%terminals ID, LPAR, RPAR, RBRA, LBRA, INT, RETURN, WHILE, IF, ELSE, ASSIGN, NUM, SC, COMMA, PLUS, MINUS, MUL, DIV, MOD, EQ, NE, LT, LE, GT, GE;
+
+%typeof program = "Program";
+%typeof func_list = "List";
+%typeof param_list = "List";
+%typeof stmt_list = "List";
+%typeof arg_list = "List";
+%typeof func = "Func";
+%typeof block = "Block";
+%typeof stmt = "Stmt";
+%typeof idDeclStmt = "IdDeclStmt";
+%typeof idDeclAss = "IdDeclAss";
+%typeof assign = "Assign";
+%typeof returnStmt = "ReturnStmt";
+%typeof whileStmt = "WhileStmt"; 
+%typeof funcStmt = "FuncStmt";
+%typeof ifStmt = "IfStmt";
+%typeof elseStmt = "ElseStmt";
+%typeof expr = "Expr";
+%typeof addExpr = "Expr";
+%typeof term = "Expr";
+%typeof factor = "Expr";
+%typeof add = "Add";
+%typeof sub = "Sub";
+%typeof mul = "Mul";
+%typeof div = "Div";
+%typeof mod = "Mod2";
+%typeof idDecl = "IdDecl";
+%typeof idUse = "IdUse";
+%typeof funcUse = "FuncUse";
+%typeof numeral = "Numeral";
+
+%goal program;
+
+program = func_list.l {: return new Program(l); :}
+	;
+
+func_list = func.f {: return new List().add(f); :}
+	| func_list.l func.f {: return l.add(f); :}
+	;
+
+func = idDecl.id LPAR RPAR block.b {: return new Func(id, new List(), b); :}
+	| idDecl.id LPAR param_list.l RPAR block.b {: return new Func(id, l, b); :}
+	;
+
+
+block = LBRA RBRA {: return new Block(new List()); :}
+	| LBRA stmt_list.l RBRA {: return new Block(l); :}
+	;
+
+stmt_list = stmt.s {: return new List().add(s); :}
+	| stmt_list.l stmt.s {: return l.add(s); :}
+	;
+
+param_list = idDecl.p {: return new List().add(p); :}
+	| param_list.l COMMA idDecl.p {: return l.add(p); :}
+	;
+
+arg_list = expr.ex {: return new List().add(ex); :}
+	| arg_list.l COMMA expr.ex {: return l.add(ex); :}
+	;
+
+stmt = idDeclStmt 
+	| idDeclAss
+	| assign
+	| returnStmt
+	| whileStmt
+	| funcStmt
+	| ifStmt
+	;
+
+idDeclStmt = idDecl.id SC {: return new IdDeclStmt(id); :}
+	;
+
+idDecl = INT ID.id {: return new IdDecl(id); :}
+	;
+
+idDeclAss = idDecl.id ASSIGN expr.ex SC {: return new IdDeclAss(id, ex); :}
+	;
+assign = idUse.id ASSIGN expr.ex SC {: return new Assign(id, ex); :}
+	;
+returnStmt = RETURN expr.ex SC {: return new ReturnStmt(ex); :}
+	;
+whileStmt = WHILE LPAR expr.ex RPAR block.b {: return new WhileStmt(ex, b); :}
+	;
+funcStmt = funcUse.id SC {: return new FuncStmt(id); :}
+	;
+ifStmt = IF LPAR expr.ex RPAR block.b {: return new IfStmt(ex, b, new Opt()); :}
+	| IF LPAR expr.ex RPAR block.b elseStmt.el {: return new IfStmt(ex, b, new Opt(el)); :}
+	;
+elseStmt = ELSE block.b {: return new ElseStmt(b); :}
+	;
+
+expr = addExpr
+	| addExpr.e1 EQ addExpr.e2 {: return new Equals(e1, e2); :}
+	| addExpr.e1 NE addExpr.e2 {: return new NotEquals(e1, e2); :}
+	| addExpr.e1 LT addExpr.e2 {: return new LessThan(e1, e2); :}
+	| addExpr.e1 LE addExpr.e2 {: return new LessEqual(e1, e2); :}
+	| addExpr.e1 GT addExpr.e2 {: return new GreaterThan(e1, e2); :}
+	| addExpr.e1 GE addExpr.e2 {: return new GreaterEqual(e1, e2); :}
+	;
+
+addExpr = term
+	| add
+	| sub
+	;
+
+add = addExpr.ex PLUS term.t {: return new Add(ex, t); :}
+	;
+
+sub = addExpr.ex MINUS term.t {: return new Sub(ex, t); :}
+	;
+
+term = factor
+	| mul
+	| div
+	| mod
+	;
+mul = term.t MUL factor.f {: return new Mul(t, f); :}
+	;
+div = term.t DIV factor.f {: return new Div(t, f); :}
+	;
+mod = term.t MOD factor.f {: return new Mod(t, f); :}
+	;
+
+factor = numeral
+	| idUse
+	| funcUse
+	| LPAR expr.ex RPAR
+	;
+numeral = NUM.num {: return new Numeral(num); :}
+	;
+idUse = ID.id {: return new IdUse(id); :}
+	;
+funcUse = idUse.id LPAR arg_list.l RPAR {: return new FuncUse(id, l); :}
+	| idUse.id LPAR RPAR {: return new FuncUse(id, new List()); :}
+	;

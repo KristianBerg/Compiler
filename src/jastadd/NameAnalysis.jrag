@@ -1,0 +1,91 @@
+aspect NameAnalysis {
+	syn IdDecl IdUse.decl() = lookup(getID());
+	inh IdDecl IdUse.lookup(String name);
+	inh IdDecl IdDecl.lookup(String name);
+	inh IdDecl Block.lookup(String name);
+	inh IdDecl Stmt.localLookup(String name);
+	inh IdDecl Func.funcLookup(String name);
+	inh IdDecl FuncUse.funcLookup(String name);
+
+	eq  Block.getStmt(int index).lookup(String name) {
+		IdDecl decl = localLookup(name, index);
+		return !decl.isUnknown() ? decl : lookup(name);
+	}
+	eq Func.getParam().lookup(String name){
+		for(int i = 0; i < getNumParam(); i++){
+			if(getParam(i).getID().equals(name)){
+				return getParam(i);
+			}
+		}
+		return unknownDecl();
+	}
+	eq Func.getBlock().lookup(String name){
+		for(int i = 0; i < getNumParam(); i++){
+			if(getParam(i).getID().equals(name)){
+				return getParam(i);
+			}
+		}
+		return unknownDecl();
+	}
+	
+	eq FuncUse.getIdUse().lookup(String name){
+		return funcLookup(name);
+	}
+
+	eq Func.getFuncName().lookup(String name){
+		return funcLookup(name);
+	}
+	eq Program.getChild().funcLookup(String name){
+		unknownDecl();
+		for(Func i: predefinedFunctions()){
+			if(i.getFuncName().getID().equals(name)){
+				return i.getFuncName();
+			}
+		}
+		for(int i = 0; i < getNumFunc(); i++){
+			if(getFunc(i).getFuncName().getID().equals(name)){
+				return getFunc(i).getFuncName();
+			}
+		}
+		return unknownDecl();
+	}
+
+	syn IdDecl Block.localLookup(String name, int until) {
+		for (int i = 0; i <= until; i++) {
+			IdDecl decl = getStmt(i).localLookup(name);
+			if (decl.getID().equals(name)) {
+				return decl;
+			}
+		}
+		return unknownDecl();
+	}
+
+	eq Program.getChild().lookup(String name) = unknownDecl();
+	eq Program.getChild().localLookup(String name) = unknownDecl();
+	
+	syn IdDecl IdDeclStmt.localLookup(String name){
+		if(getIdDecl().getID().equals(name)){
+			return getIdDecl();
+		}
+		return unknownDecl();
+	}
+
+	syn IdDecl IdDeclAss.localLookup(String name){
+		if(getIdDecl().getID().equals(name)){
+			return getIdDecl();
+		}
+		return unknownDecl();
+	}
+
+	syn boolean IdDecl.isMultiplyDeclared() = lookup(getID()) != this;
+}
+
+aspect CircularDefinitions {
+	syn boolean IdUse.isCircular() = inExprOf(lookup(getID()));
+	inh boolean IdUse.inExprOf(IdDecl decl);
+	eq IdDeclAss.getChild().inExprOf(IdDecl decl)
+		= getIdDecl() == decl;
+	eq Program.getChild().inExprOf(IdDecl decl) = false;
+}
+
+
